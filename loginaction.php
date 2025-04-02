@@ -3,10 +3,10 @@ session_start();
 include 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $conn->real_escape_string($_POST['username']);
+    $username = $conn->real_escape_string($_POST['username']);
     $password = $_POST['password'];
 
-    $query = "SELECT * FROM users WHERE Name = '$name'";
+    $query = "SELECT * FROM users WHERE Username = '$username'";
     $result = $conn->query($query);
 
     if ($result->num_rows == 1) {
@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['username'] = $user['Name'];
+            $_SESSION['username'] = $user['Username'];
             $_SESSION['user_type'] = $user['user_type'];
 
             header("Location: dashboard.php");

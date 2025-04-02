@@ -1,30 +1,45 @@
 <?php
-include 'db_connect.php';
+// Start session
+session_start();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $conn->real_escape_string($_POST['Name']);
-    $email = $conn->real_escape_string($_POST['email']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Secure password hash
-    $user_type = 'customer';
-    $status = 'active';
+// Include database connection
+include("db_connect.php"); 
 
-    // Check if user exists
-    $checkQuery = "SELECT * FROM users WHERE Name = '$name' OR email = '$email'";
-    $checkResult = $conn->query($checkQuery);
+// Get form values
+$name = $_POST['Name'];
+$username = $_POST['Username'];
+$email = $_POST['email'];
+$password = $_POST['password'];
 
-    if ($checkResult->num_rows > 0) {
-        echo "<script>alert('Username or email already exists.'); window.location.href='register.php';</script>";
-    } else {
-        $insertQuery = "INSERT INTO users (Name, email, password, user_type, status)
-                        VALUES ('$name', '$email', '$password', '$user_type', '$status')";
-        
-        if ($conn->query($insertQuery) === TRUE) {
-            echo "<script>alert('Registration successful! You can now log in.'); window.location.href='login.php';</script>";
-        } else {
-            echo "Error: " . $insertQuery . "<br>" . $conn->error;
-        }
-    }
+// Hash the password for security
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+// Set default user_type and status
+$user_type = 'customer'; // default value
+$status = 'active';      // default status
+
+// Check if username or email already exists
+$check_query = "SELECT * FROM users WHERE Username = ? OR email = ?";
+$stmt = $conn->prepare($check_query);
+$stmt->bind_param("ss", $username, $email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    echo "Username or Email already exists. Please go back and try again.";
+    exit();
 }
 
-$conn->close();
+// Insert into users table
+$query = "INSERT INTO users (Name, Username, email, password, user_type, status) VALUES (?, ?, ?, ?, ?, ?)";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ssssss", $name, $username, $email, $hashed_password, $user_type, $status);
+
+if ($stmt->execute()) {
+    // Registration successful, redirect to login
+    header("Location: login.php");
+    exit();
+} else {
+    echo "Registration failed: " . $stmt->error;
+}
 ?>

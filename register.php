@@ -13,6 +13,9 @@
     <label>Full Name</label>
     <input class="w3-input" type="text" name="Name" required>
 
+    <label>Username</label>
+    <input class="w3-input" type="text" name="Username" required>
+
     <label>Email</label>
     <input class="w3-input" type="email" name="email" required>
 

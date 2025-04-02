@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 05, 2025 at 05:28 PM
+-- Generation Time: Apr 02, 2025 at 04:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -74,11 +74,20 @@ CREATE TABLE `transactions` (
 CREATE TABLE `users` (
   `user_id` int(11) UNSIGNED NOT NULL,
   `Name` varchar(20) NOT NULL,
+  `Username` varchar(20) NOT NULL,
   `email` varchar(50) NOT NULL,
   `password` varchar(30) NOT NULL,
   `user_type` enum('customer','admin') NOT NULL,
   `status` enum('active','locked') NOT NULL DEFAULT 'active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `Name`, `Username`, `email`, `password`, `user_type`, `status`) VALUES
+(4, 'Michael OMeara', 'MikeO', 'MikeO@gmail.com', '$2y$10$319xUWr.GrrojZGPDYYmuOg', 'customer', 'active'),
+(5, 'John Doe', 'JohnD', 'JohnD@gmail.com', '$2y$10$A2z/bMdMvmATU5r30rMpEuu', 'customer', 'active');
 
 --
 -- Indexes for dumped tables
@@ -140,7 +149,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
