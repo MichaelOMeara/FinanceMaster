@@ -1,5 +1,5 @@
 <?php
-    // require "DBConnect.php
+    //require "DBConnect.php
     $fname = $_GET["fname"];
     $lname = $_GET["lname"];
     
