@@ -1,37 +1,48 @@
 <!DOCTYPE html>
 <!link to mystyles>
 <?php include 'header.php';?>
-    <div class="container w-75 mt-3">
-    <h3>Sign Up Form</h3>
+<head>
+  <title>Register - Finance Master</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="mystyle.css">
+</head>
+
+    <div class="container w-75 mt-3">     
+        
            
-    <div class = "w3-container">
+    <div class = "w3-container w3-padding-64 w3-card-4 w3-white w3-margin">
         
         <form name = "signup" action = "signupAction.php" method = "get"
               onsubmit="return validatePasswords()"> 
-    
+                <h2>Sign Up Form</h2>
             <div class = "item">
-            <label>first name</label>
-            <input type = "text" name = "fname" size = "40" required />
+            <label>First Name</label>
+            <input class="w3-input" type = "text" name = "fname" size = "40" required />
             </div>
 
             <div class = "item">
-            <label>last name</label>
-            <input type = "text" name = "lname" size = "40" required />
+            <label>Last Name</label>
+            <input class ="w3-input" type = "text" name = "lname" size = "40" required />
             </div>
 
+            <div class = "item">
+            <label>Username</label>
+            <input class="w3-input" type = "text" name = "username" size = "40" required />
+            </div>    
+                
             <div class = "item">
             <label>Email</label>
-            <input type = "text" name = "email" size = "40" required />
+            <input class="w3-input" type = "text" name = "email" size = "40" required />
             </div>
 
             <div class = "item">
             <label>Password</label>
-            <input type = "password" id= "pswd" name = "pswd" size = "40" required/>
+            <input class="w3-input" type = "password" id= "pswd" name = "pswd" size = "40" required/>
             </div>
 
             <div class = "item">
             <label>Retype Password</label>
-            <input type = "password" id= "pswd2" name = "pswd2" size = "40" required 
+            <input class="w3-input" type = "password" id= "pswd2" name = "pswd2" size = "40" required 
                    onkeyup=""checkPasswordMatch()"/>
             <span id="message" class="error"></span>
             </div>
