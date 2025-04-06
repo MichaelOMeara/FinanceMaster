@@ -1,23 +1,50 @@
 <?php
-    //require "DBConnect.php
+    // Start session
+    session_start();
+
+    // Include database connection
+    include("db_connect.php"); 
+    
     $fname = $_GET["fname"];
     $lname = $_GET["lname"];
-    
+    $username = $_GET["username"];
+    $email = $_GET["email"];
     $pswd = $_GET["pswd"];
-    $pswd2 = $_GET["pswd2"];
-    $usertype ="customer";
+    $user_type ="customer";
+    $status = "active";
     $name = $fname. " " . $lname;
+    $password = $pswd; 
     
-    if($pswd == $pswd2){
-        $Password = $pswd;
+    // Hash the password for security
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    // Check if username or email already exists
+    $check_query = "SELECT * FROM users WHERE Username = ? OR email = ?";
+    $stmt = $conn->prepare($check_query);
+    $stmt->bind_param("ss", $username, $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    
+    if ($result->num_rows > 0) {
+    echo "Username or Email already exists. Please go back and try again.";
+    exit();
+}
+    
+    
+    // Insert into users table
+    $query = "INSERT INTO users (Name, Username, email, password, user_type, status) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssssss", $name, $username, $email, $hashed_password, $user_type, $status);
+
+    if ($stmt->execute()) {
+        // Registration successful, redirect to login
+        header("Location: login.php");
+        exit();
+    } else {
+        echo "Registration failed: " . $stmt->error;
     }
-    
-    
-    /*
-    $sql = "insert into users values (0, '".$name. "', '"
-            . $email . "', '" $Password . "', '" $usertype"')";
-     echo modifyDB($sql).
-             */
+             
      
 ?>
 
