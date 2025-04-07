@@ -6,6 +6,12 @@
   <link rel="stylesheet" href="mystyle.css">
 </head>
 <body class="w3-light-grey">
+<?php session_start(); ?>
+<div class="w3-bar w3-light-grey w3-border-bottom">
+  <a href="index.php" class="w3-bar-item w3-button">Home</a>
+  <a href="register.php" class="w3-bar-item w3-button">Register</a>
+  <a href="login.php" class="w3-bar-item w3-button w3-right">Login</a>
+</div>
 
 <div class="w3-container w3-padding-64 w3-card-4 w3-white w3-margin">
   <h2>Register</h2>
