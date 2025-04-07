@@ -3,13 +3,19 @@ session_start();
 include 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $conn->real_escape_string($_POST['username']);
-    $password = $_POST['password'];
+    // Trim whitespace from inputs
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']); // <-- TRIM password input
 
-    $query = "SELECT * FROM users WHERE Username = '$username'";
-    $result = $conn->query($query);
+    // Debug (optional)
+    // var_dump($password);
 
-    if ($result->num_rows == 1) {
+    $stmt = $conn->prepare("SELECT * FROM users WHERE Username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
         if ($user['status'] !== 'active') {
@@ -17,10 +23,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
-        if (password_verify($password, $user['password'])) {
+        // Trim the hashed password too (just to be safe, though usually not needed)
+        $hashed = trim($user['password']);
+
+        if (password_verify($password, $hashed)) {
+            // Success
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['Username'];
             $_SESSION['user_type'] = $user['user_type'];
+            $_SESSION['status'] = $user['status'];
 
             header("Location: dashboard.php");
             exit();
@@ -30,7 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "<script>alert('User not found.'); window.location.href='login.php';</script>";
     }
-}
 
+    $stmt->close();
+}
 $conn->close();
 ?>
