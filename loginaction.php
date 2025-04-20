@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 include 'db_connect.php';
 
@@ -6,7 +7,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Trim whitespace from inputs
     $username = trim($_POST['username']);
     $password = trim($_POST['password']); // <-- TRIM password input
-
     // Debug (optional)
     // var_dump($password);
 
@@ -33,7 +33,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_type'] = $user['user_type'];
             $_SESSION['status'] = $user['status'];
 
-            header("Location: dashboard.php");
+            // Redirect based on user type
+            if ($user['user_type'] == 'admin') {
+                header("Location: admin_dashboard.php");
+            } else {
+                header("Location: dashboard.php");
+            }
             exit();
         } else {
             echo "<script>alert('Invalid password.'); window.location.href='login.php';</script>";
