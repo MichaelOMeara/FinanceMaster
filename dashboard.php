@@ -1,8 +1,8 @@
 <?php
 session_start();
+include("db_connect.php");
 
-// Redirect if user is not logged in
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'customer') {
     header("Location: login.php");
     exit();
 }
