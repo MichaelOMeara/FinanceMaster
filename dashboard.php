@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'header.php';
+include("db_connect.php");
 
 // Redirect if user is not logged in
 if (!isset($_SESSION['user_id'])) {
