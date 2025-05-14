@@ -9,7 +9,7 @@
 <body class="w3-light-grey">
 <div class="w3-bar w3-light-grey w3-border-bottom">
   <a href="index.php" class="w3-bar-item w3-button">Home</a>
-  <a href="register.php" class="w3-bar-item w3-button">Register</a>
+  <a href="signup.php" class="w3-bar-item w3-button">Register</a>
   <a href="login.php" class="w3-bar-item w3-button w3-right">Login</a>
 </div>
 
