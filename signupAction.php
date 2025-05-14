@@ -36,7 +36,7 @@ if ($stmt->execute()) {
     $user_id = $conn->insert_id;
 
     // Create default accounts
-    $account_types = ["Savings", "Checkings", "Loan"];
+    $account_types = ["Savings", "Checking", "Loan"];
     foreach ($account_types as $type) {
         $acc_query = "INSERT INTO accounts (user_id, account_type, balance) VALUES (?, ?, 0.00)";
         $acc_stmt = $conn->prepare($acc_query);
