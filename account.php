@@ -72,7 +72,6 @@ foreach ($accounts as $account) {
         <div id="accounts-container"></div>
     </div>
 
-    <?php include("footer.php"); ?>
 </body>
 </html>
 

@@ -3,58 +3,66 @@ session_start();
 require 'db_connect.php';
 include 'header.php';
 
-// TEMP: Replace with $_SESSION['user_id'] when login is active
-$user_id = $_SESSION['user_id']; 
+$user_id = $_SESSION['user_id'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $account_id = $_POST['account_id'];
-    $action = $_POST['action'];
-    $amount = floatval($_POST['amount']);
+// Fetch user's account IDs
+$stmt = $pdo->prepare("SELECT account_id FROM accounts WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$account_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    if ($amount <= 0) {
-        header("Location: deposit_withdraw.php?error=Amount must be greater than zero.");
-        exit;
-    }
-
-    // Get account
-    $stmt = $pdo->prepare("SELECT * FROM accounts WHERE account_id = ? AND user_id = ? AND status = 'active'");
-    $stmt->execute([$account_id, $user_id]);
-    $account = $stmt->fetch();
-
-    if (!$account) {
-        header("Location: deposit_withdraw.php?error=Account not found or unauthorized.");
-        exit;
-    }
-
-    if ($action === 'withdraw' && $account['balance'] < $amount) {
-        header("Location: deposit_withdraw.php?error=Insufficient funds for withdrawal.");
-        exit;
-    }
-
-    // Begin transaction
-    $pdo->beginTransaction();
-
-    try {
-        $newBalance = ($action === 'deposit')
-            ? $account['balance'] + $amount
-            : $account['balance'] - $amount;
-
-        // Update balance
-        $update = $pdo->prepare("UPDATE accounts SET balance = ? WHERE account_id = ?");
-        $update->execute([$newBalance, $account_id]);
-
-        // Record transaction
-        $log = $pdo->prepare("INSERT INTO transactions (account_id, type, amount, from_account, to_account) VALUES (?, ?, ?, NULL, NULL)");
-        $log->execute([$account_id, $action, $amount]);
-
-        $pdo->commit();
-
-        header("Location: transactions.php");
-        exit;
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        header("Location: deposit_withdraw.php?error=Transaction failed. Please try again.". urlencode($e->getMessage()));
-        exit;
-    }
+if (empty($account_ids)) {
+    die("No accounts found.");
 }
+
+// Fetch all transactions linked to these accounts
+$in_clause = implode(',', array_fill(0, count($account_ids), '?'));
+
+$query = $pdo->prepare("
+    SELECT * FROM transactions
+    WHERE account_id IN ($in_clause)
+    ORDER BY date DESC
+");
+$query->execute($account_ids);
+$transactions = $query->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Finance Master - Transactions</title>
+  <style>
+    body { font-family: Arial; margin: 20px; background: #f1f1f1;}
+    .card { background: white; padding: 20px; margin: 15px 0; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+    .transfer { background: #e0f7fa; }
+    .deposit { background: #e8f5e9; }
+    .withdrawal { background: #ffebee; }
+  </style>
+</head>
+<body>
+
+<h2>Your Transactions</h2>
+
+<?php foreach ($transactions as $tx): ?>
+  <div class="card <?= $tx['type'] ?>">
+    <p><strong>Type:</strong> <?= ucfirst($tx['type']) ?></p>
+    <p><strong>Amount:</strong> $<?= number_format($tx['amount'], 2) ?></p>
+    <p><strong>Date:</strong> <?= $tx['date'] ?></p>
+
+    <?php if ($tx['type'] == 'transfer'): ?>
+      <p><strong>From Account ID:</strong> <?= $tx['from_account'] ?></p>
+      <p><strong>To Account ID:</strong> <?= $tx['to_account'] ?></p>
+    <?php else: ?>
+      <p><strong>Account ID:</strong> <?= $tx['account_id'] ?></p>
+    <?php endif; ?>
+  </div>
+<?php endforeach; ?>
+
+</body>
+</html>
+
+
+
+
+
 

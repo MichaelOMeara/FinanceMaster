@@ -39,7 +39,7 @@
 <div class="navbar">
   <div class="brand">Finance Master</div>
   <div class="nav-links">
-    <a href="account.php">Dashboard</a>
+    <a href="account.php">Accounts</a>
     <a href="deposit_withdraw.php">Deposit/Withdraw</a>
     <a href="transfer.php">Transfer</a>
     <a href="transactions.php">Transactions</a>
