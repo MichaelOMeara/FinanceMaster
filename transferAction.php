@@ -1,6 +1,6 @@
 <?php
 session_start();
-echo"Logged in user_id " .$_SESSION['user_id'];
+include 'header.php';
 require 'db_connect.php';
 
 $user_id = $_SESSION['user_id']; 
@@ -11,11 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = floatval($_POST['amount']);
 
     if ($from_account_id == $to_account_id) {
-        die("Cannot transfer to the same account.");
+        header("Location: transfer.php?error=Cannot transfer to the same account.");
+        exit;
     }
 
     if ($amount <= 0) {
-        die("Invalid transfer amount.");
+        header("Location: transfer.php?error=Invalid transfer amount.");
+        exit;
     }
 
     // Fetch both accounts
@@ -24,7 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($accounts) != 2) {
-        die("Accounts not found or not owned by user.");
+        header("Location: transfer.php?error=Accounts not found or unauthorized.");
+        exit;
     }
 
     // Identify which is which
@@ -36,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($from_account['balance'] < $amount) {
-        die("Insufficient funds.");
+        header("Location: transfer.php?error=Insufficient funds in the selected account.");
+        exit;
     }
 
     // Begin transaction
@@ -44,16 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Update balances
-        $new_from_balance = $from_account['balance'] - $amount;
-        $new_to_balance = $to_account['balance'] + $amount;
-
         $update_from = $pdo->prepare("UPDATE accounts SET balance = ? WHERE account_id = ?");
-        $update_from->execute([$new_from_balance, $from_account_id]);
+        $update_from->execute([$from_account['balance'] - $amount, $from_account_id]);
 
         $update_to = $pdo->prepare("UPDATE accounts SET balance = ? WHERE account_id = ?");
-        $update_to->execute([$new_to_balance, $to_account_id]);
+        $update_to->execute([$to_account['balance'] + $amount, $to_account_id]);
 
-        // Record transfer
+        // Record the transaction
         $record = $pdo->prepare("INSERT INTO transactions (account_id, type, amount, from_account, to_account) VALUES (?, 'transfer', ?, ?, ?)");
         $record->execute([$to_account_id, $amount, $from_account_id, $to_account_id]);
 
@@ -62,7 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     } catch (Exception $e) {
         $pdo->rollBack();
-        die("Transfer failed: " . $e->getMessage());
+        header("Location: transfer.php?error=Transfer failed: " . urlencode($e->getMessage()));
+        exit;
     }
 }
+
 ?>

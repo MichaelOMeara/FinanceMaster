@@ -1,7 +1,7 @@
 <?php
 session_start();
-echo"Logged in user_id " .$_SESSION['user_id'];
 require 'db_connect.php';
+include 'header.php';
 
 // Redirect if user is not logged in
 if (!isset($_SESSION['user_id'])) {
@@ -32,52 +32,47 @@ foreach ($accounts as $account) {
 
 ?>
 
-                   echo"<pre>";
-                   print_r($accounts[loan]);
-                   echo"</pre>;
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Finance Master - My Accounts</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        .account-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px auto;
-            max-width: 400px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .account-title { font-size: 1.5em; margin-bottom: 10px; }
-        .balance { font-size: 1.2em; color: green; }
-        .status { font-weight: bold; color: #555; }
-    </style>
+    <title>Your Accounts - Finance Master</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="mystyle.css">
+    <script>
+        // Fetch account data from accountAction.php and display on page
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("accountAction.php")
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById("accounts-container");
+                    data.forEach(account => {
+                        const card = document.createElement("div");
+                        card.className = "w3-card-4 w3-margin w3-padding w3-white";
+
+                        const title = document.createElement("h3");
+                        title.textContent = account.account_type + " Account";
+
+                        const balance = document.createElement("p");
+                        balance.innerHTML = "<strong>Balance:</strong> $" + parseFloat(account.balance).toFixed(2);
+
+                        card.appendChild(title);
+                        card.appendChild(balance);
+                        container.appendChild(card);
+                    });
+                })
+                .catch(error => console.error("Error loading accounts:", error));
+        });
+    </script>
 </head>
 <body>
 
-    <h1>Welcome to Finance Master</h1>
-    <h2>Your Accounts</h2>
+    <div class="w3-container w3-padding-64">
+        <h2>Your Accounts</h2>
+        <div id="accounts-container"></div>
+    </div>
 
-    <?php foreach (['savings', 'checking', 'loan'] as $type): ?>
-        <?php $account = $accountData[$type]; ?>
-        
-        <div class="account-card">
-            <div class="account-title"><?= ucfirst($type) ?> Account</div>
-            <?php if ($account): ?>
-                <p><strong>Account ID:</strong> <?= $account['account_id'] ?></p>
-                <p class="balance"><strong>Balance:</strong> $<?= number_format($account['balance'], 2) ?></p>
-                <p class="status"><strong>Status:</strong> <?= ucfirst($account['status']) ?></p>
-                
-                
-            <?php else: ?>
-                <p>No <?= $type ?> account found.</p>
-            <?php endif; ?>
-        </div>
-    <?php endforeach; ?>
-
+    <?php include("footer.php"); ?>
 </body>
 </html>
+

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db_connect.php';
+include 'header.php';
 
 // TEMP: Replace with $_SESSION['user_id'] when login is active
 $user_id = $_SESSION['user_id']; 
@@ -9,6 +10,8 @@ $user_id = $_SESSION['user_id'];
 $stmt = $pdo->prepare("SELECT * FROM accounts WHERE user_id = ? AND status = 'active'");
 $stmt->execute([$user_id]);
 $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$errorMessage = isset($_GET['error']) ? $_GET['error'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -18,11 +21,29 @@ $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <title>Finance Master - Transfer Money</title>
   <style>
     body { font-family: Arial; margin: 20px; }
-    .form-card { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
-    input, select, button { width: 100%; margin: 10px 0; padding: 10px; }
+    .form-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+    }
   </style>
+  <script>
+    // If PHP passes an error, show it
+    <?php if (!empty($errorMessage)): ?>
+      alert("<?= htmlspecialchars($errorMessage) ?>");
+    <?php endif; ?>
+  </script>
 </head>
 <body>
+
 
 <h2>Transfer Funds Between Accounts</h2>
 

@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'header.php';
 
 // Redirect if user is not logged in
 if (!isset($_SESSION['user_id'])) {
