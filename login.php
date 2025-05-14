@@ -24,6 +24,15 @@
 
     <button class="w3-button w3-green w3-margin-top" type="submit">Login</button>
   </form>
+
+  <!-- Forgot password button -->
+  <div class="w3-margin-top">
+    <form action="forgot_password.php" method="get">
+      <label>Forgot your password?</label><br>
+      <input class="w3-input w3-border w3-margin-top" type="text" name="username" placeholder="Enter your username" required>
+      <button class="w3-button w3-blue w3-margin-top">Recover Password</button>
+    </form>
+  </div>
 </div>
 
 </body>
